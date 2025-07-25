@@ -3,7 +3,7 @@
   "description": "This strategy is managed by a discretionary global macro manager with a strong track record of compounding capital since 2019. The manager employs a multidisciplinary approach, integrating bottom-up fundamental research, macroeconomic data, technical analysis, market positioning, and narrative interpretation.",
   "metrics": [
     { "label": "Annualized Return", "value": "23.7%" },
-    { "label": "Annualized Volatility", "value": "24.4%" },
+    { "label": "Annualized Vol.", "value": "24.4%" },
     { "label": "Sharpe Ratio", "value": "0.94" },
     { "label": "Winning Months", "value": "48.5%" },
     { "label": "Max. Drawdown", "value": "22.6%" }

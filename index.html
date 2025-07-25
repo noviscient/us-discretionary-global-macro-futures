@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Product</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            font-family: 'Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif';
+        }
+        @media print {
+            html, body {
+                margin: 0;
+                padding: 0;
+                height: auto;
+                background: white;
+                font-family: 'Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif';
+            }
+
+            body > *:not(main) {
+                display: none;
+            }
+
+            main {
+                width: 100% !important;
+                background: white !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                page-break-inside: avoid;
+            }
+
+            section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+<!--<main class="w-[794px] h-[1123px] bg-gray-100 mx-auto my-10 p-8">-->
+<main class="w-[794px] bg-gray-100 mx-auto my-6 p-4">
+
+    <h1 id="title" class="text-4xl font-bold text-[#4a4cb3] mb-6">Loading ...</h1>
+    <p id="description" class="text-sm text-gray-700 leading-snug">Loading ...</p>
+
+    <section id="metrics" class="flex mt-6 space-x-6"></section>
+
+    <hr class="my-4 border-t border-gray-300" />
+
+    <section class="flex mt-2 space-x-2 min-h-[265px]">
+    <!-- Left: Strategy text -->
+        <div class="w-[305px] bg-white p-4 shadow-md rounded-md">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Strategy</h2>
+            <p id="strategy" class="text-sm text-gray-700 leading-relaxed">
+                Loading ...
+        </div>
+        <!-- Right: Chart placeholder -->
+        <div id="net-return-chart" class="flex-1 h-[265px]"></div>
+    </section>
+
+    <section class="flex mt-2 space-x-6 min-h-[195px]">
+        <!-- Left: General Information -->
+        <div class="w-[305px] bg-white p-4 shadow-md rounded-md">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">General Information</h2>
+            <ul id="general-info" class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700"></ul>
+        </div>
+
+        <!-- Right: Return Attribution Chart -->
+        <div class="flex-1 p-4">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Return Attributions (Last 12 months)</h2>
+            <div id="return-attribution-chart" class="w-full h-[140px]"></div>
+        </div>
+    </section>
+
+
+    <section class="flex mt-2 space-x-6 min-h-[245px]">
+        <!-- Left: Return Statistics -->
+        <div class="w-[305px] bg-white p-4 shadow-md rounded-md">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Return Statistics</h2>
+            <table class="w-full text-sm text-gray-700 text-left border-collapse">
+                <thead>
+                <tr class="border-b">
+                    <th class="py-1 pr-4">Period</th>
+                    <th class="py-1 pr-4">Best</th>
+                    <th class="py-1 pr-4">Worst</th>
+                    <th class="py-1 pr-4">Avg.</th>
+                    <th class="py-1">Mdn.</th>
+                </tr>
+                </thead>
+                <tbody id="return-stats"></tbody>
+            </table>
+        </div>
+        <!-- Right: Worst Months -->
+        <div class="flex-1 p-4">
+            <h2 class="text-lg font-semibold text-[#4a4cb3] mb-2">Worst Months</h2>
+            <div id="worst-months-chart" class="w-full h-[150px]"></div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('title').textContent = data.title;
+        document.getElementById('description').textContent = data.description;
+        document.getElementById('strategy').textContent = data.strategy;
+
+        // Metrics
+        const metricsContainer = document.getElementById('metrics');
+        data.metrics.forEach(m => {
+          metricsContainer.innerHTML += `
+            <div class="w-[140px] h-[70px] bg-white shadow-md rounded-md flex flex-col items-center justify-center text-center p-2">
+              <div class="text-xl font-bold text-[#4a4cb3]">${m.value}</div>
+              <div class="text-xs text-gray-600">${m.label}</div>
+            </div>`;
+        });
+
+        // General Info
+        const infoList = document.getElementById('general-info');
+        for (let key in data.general_information) {
+        infoList.innerHTML += `
+            <li>
+            <div class="text-gray-500">${key}</div>
+            <div class="font-semibold">${data.general_information[key]}</div>
+            </li>
+        `;
+        }
+
+
+        // Return Stats
+        const statsBody = document.getElementById('return-stats');
+        data.return_statistics.forEach(row => {
+          statsBody.innerHTML += `
+            <tr class="border-b">
+              <td class="py-1 pr-4">${row.period}</td>
+              <td class="py-1 pr-4">${row.best}</td>
+              <td class="py-1 pr-4">${row.worst}</td>
+              <td class="py-1 pr-4">${row.avg}</td>
+              <td class="py-1">${row.mdn}</td>
+            </tr>`;
+        });
+      });
+
+      fetch('merged_cum_returns.csv')
+        .then(res => res.text())
+        .then(csvText => {
+            const result = Papa.parse(csvText, { header: true, dynamicTyping: true });
+            const data = result.data;
+
+            const dates = data.map(row => row.date);
+            const strategy = data.map(row => row.Strategy);
+            const qai = data.map(row => row["IQ Hedge Multi-Strategy Tracker ETF (QAI)"]);
+            const gsci = data.map(row => row["MSCI World Index"]);
+
+            // Helper to filter ranges
+            const strategyTrack = [];
+            const datesTrack = [];
+
+            data.forEach(row => {
+            const d = row.date;
+                strategyTrack.push(row.Strategy);
+                datesTrack.push(d);
+            });
+
+            const traceStrategyTrack = {
+                x: datesTrack,
+                y: strategyTrack,
+                mode: 'lines',
+                name: 'Strategy - Track Record',
+                line: { color: '#4a4cb3', width: 2, dash: 'dash' },
+                hoverlabel: {namelength :-1}
+            };
+
+            const traceQAI = {
+                x: dates,
+                y: qai,
+                mode: 'lines',
+                name: 'IQ Hedge Multi-Strategy Tracker ETF (QAI)',
+                line: { color: '#adbdf4', width: 2 },
+                hoverlabel: {namelength :-1}
+            };
+
+            const traceGSCI = {
+                x: dates,
+                y: gsci,
+                mode: 'lines',
+                name: 'MSCI World Index',
+                line: { color: '#8dd397', width: 2 },
+                hoverlabel: {namelength :-1}
+            };
+
+            const layout = {
+                margin: { t: 20, r: 20, b: 30, l: 40 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: true,
+                legend: {
+                    orientation: 'v',
+                    x: 0,
+                    y: 1,
+                    xanchor: 'left',
+                    yanchor: 'top',
+                    bgcolor: 'rgba(0,0,0,0)',
+                    font: { size: 10 }
+                },
+                xaxis: { tickfont: { size: 10 } },
+                yaxis: { tickformat: '.2f', tickfont: { size: 10 } },
+                height: 305,
+                hoverlabel: {
+                    bgcolor: "#FFF",
+                    bordercolor: "#4a4cb3",
+                    font: { size: 12, color: "#000" }
+                }
+            };
+
+            Plotly.newPlot(
+                'net-return-chart',
+                [traceStrategyTrack, traceQAI, traceGSCI],
+                layout,
+                {
+                    responsive: true,
+                    displayModeBar: false
+                }
+            );
+        });
+
+        fetch('factor_attributions.csv')
+            .then(res => res.text())
+            .then(csvText => {
+            const result = Papa.parse(csvText, { header: true, dynamicTyping: true });
+            const data = result.data.filter(row => row.Label && !isNaN(row.Value));
+
+            const trace = {
+                x: data.map(row => row.Value),
+                y: data.map(row => row.Label),
+                type: 'bar',
+                orientation: 'h',
+                text: data.map(row => `${(row.Value * 100).toFixed(2)}%`),
+                textposition: 'auto',
+                marker: {
+                color: data.map(row => row.Value >= 0 ? '#4a90e2' : '#b0d9f6'),
+                line: { width: 1, color: '#4a4cb3' }
+                },
+                hovertemplate: '%{y}: %{x:.2%}<extra></extra>'
+            };
+
+            const layout = {
+                margin: { t: 10, r: 10, b: 30, l: 80 },
+                xaxis: {
+                    tickformat: '.0%',
+                    range: [-0.16, 0.16],
+                    zeroline: true,
+                    zerolinewidth: 1,
+                    zerolinecolor: 'black',
+                    showgrid: false
+                },
+                yaxis: { automargin: true },
+                height: 170,
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false,
+                hoverlabel: {
+                    bgcolor: "#FFF",
+                    bordercolor: "#4a4cb3",
+                    font: { size: 12, color: "#000" }
+                }
+            };
+
+            Plotly.newPlot('return-attribution-chart', [trace], layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+            });
+
+            fetch('worst_months.csv')
+                .then(res => res.text())
+                .then(csvText => {
+                    const result = Papa.parse(csvText, { header: true, dynamicTyping: true });
+                    const data = result.data.filter(row => row.date && row.Strategy !== undefined);
+
+                    const dates = data.map(row => new Date(row.date).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+
+                    const traceStrategy = {
+                    x: dates,
+                    y: data.map(row => row.Strategy),
+                    name: 'Strategy',
+                    type: 'bar',
+                    marker: { color: '#377eb8' }
+                    };
+
+                    const traceQAI = {
+                        x: dates,
+                        y: data.map(row => row["IQ Hedge Multi-Strategy Tracker ETF (QAI)"]),
+                        name: 'IQ Hedge Multi-Strategy Tracker ETF (QAI)',
+                        type: 'bar',
+                        marker: { color: '#9ecae1' }
+                    };
+
+                    const traceDow = {
+                        x: dates,
+                        y: data.map(row => row["MSCI World Index"]),
+                        name: 'MSCI World Index',
+                        type: 'bar',
+                        marker: { color: '#a1d99b' }
+                    };
+
+                    const layout = {
+                        barmode: 'group',
+                        margin: { t: 30, r: 10, b: 50, l: 50 },
+                        xaxis: {
+                            tickangle: -35,
+                            tickfont: { size: 10 },
+                            automargin: true
+                        },
+                        yaxis: {
+                            tickformat: '.0%',
+                            tickfont: { size: 10 },
+                            zeroline: true,
+                            zerolinecolor: 'black',
+                            automargin: true
+                        },
+                        legend: {
+                            orientation: 'h',
+                            x: 1,
+                            y: 1.3,
+                            xanchor: 'right',
+                            yanchor: 'top',
+                            bgcolor: 'rgba(0,0,0,0)',
+                            font: { size: 10 }
+                        },
+
+                        height: 210,
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        hoverlabel: {
+                            bgcolor: "#FFF",
+                            bordercolor: "#4a4cb3",
+                            font: { size: 12, color: "#000" }
+                        }
+                    };
+
+                    Plotly.newPlot('worst-months-chart', [traceStrategy, traceQAI, traceDow], layout, {
+                    responsive: true,
+                    displayModeBar: false
+                    });
+                });
+
+  </script>
+
+</body>
+</html>

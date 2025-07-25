@@ -1,0 +1,27 @@
+{
+  "title": "US Discretionary Global Macro Futures",
+  "description": "This strategy is managed by a discretionary global macro manager with a strong track record of compounding capital since 2019. The manager employs a multidisciplinary approach, integrating bottom-up fundamental research, macroeconomic data, technical analysis, market positioning, and narrative interpretation.",
+  "metrics": [
+    { "label": "Annualized Return", "value": "23.7%" },
+    { "label": "Annualized Volatility", "value": "24.4%" },
+    { "label": "Sharpe Ratio", "value": "0.94" },
+    { "label": "Winning Months", "value": "48.5%" },
+    { "label": "Max. Drawdown", "value": "22.6%" }
+  ],
+  "strategy": "The strategy is implemented via U.S.-listed futures and focuses on delivering absolute returns across market cycles with low correlation to both equities and traditional trend-following CTAs. It emphasizes capital preservation and robustness, with disciplined risk management and modest margin usage that allows for notional funding on SMA relationships.",
+  "general_information": {
+    "Novi Symbol": "BKHS_1",
+    "Stage": "Pipeline",
+    "Source": "Track Record",
+    "Inception Date": "June 2018",
+    "Instrument": "US Multi-Asset",
+    "Location": "US"
+  },
+  "return_statistics": [
+    { "period": "1M", "best": "10.06", "worst": "-9.12", "avg": "0.10", "mdn": "0.00" },
+    { "period": "3M", "best": "21.73", "worst": "-13.75", "avg": "0.29", "mdn": "0.11" },
+    { "period": "1Y", "best": "29.27", "worst": "-12.20", "avg": "1.13", "mdn": "0.74" },
+    { "period": "3Y", "best": "53.10", "worst": "-17.75", "avg": "3.37", "mdn": "2.11" },
+    { "period": "5Y", "best": "51.68", "worst": "-16.85", "avg": "5.64", "mdn": "3.68" }
+  ]
+}
